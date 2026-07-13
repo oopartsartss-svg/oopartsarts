@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OOPartsArts</title>
+  <style>
+    :root {
+      --bg:  #F8F8F6;
+      --fg:  #111;
+      --gap: 3px;
+      --bw:  2px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Courier New', Courier, monospace;
+    }
+    a { color: inherit; text-decoration: none; }
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #D8D8D5;
+    }
+
+    /* ===========================
+       NAV
+    =========================== */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      border-bottom: var(--bw) solid var(--fg);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ロゴ画像 — 手描きの傾きをそのまま活かす */
+    .nav-logo img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+      background: transparent;
+      display: block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+    .nav-links a {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .nav-links a:hover { text-decoration: underline; }
+
+    /* ===========================
+       HERO
+    =========================== */
+    .hero {
+      border-bottom: var(--bw) solid var(--fg);
+      padding: 3rem 1rem 2.5rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    /* ヒーローにもロゴを大きく */
+    .hero-logo img {
+      height: clamp(80px, 16vw, 160px);
+      width: auto;
+      object-fit: contain;
+      background: transparent;
+    }
+
+    .hero-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #666;
+      text-align: right;
+      line-height: 1.9;
+    }
+
+    /* ===========================
+       IMAGE GRID
+    =========================== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--gap);
+      padding: var(--gap);
+      border-bottom: var(--bw) solid var(--fg);
+    }
+
+    .cell {
+      position: relative;
+      overflow: hidden;
+      background: #D8D8D5;
+      aspect-ratio: 1;
+    }
+    .cell.w2    { grid-column: span 2; }
+    .cell.w3    { grid-column: span 3; }
+    .cell.h2    { grid-row:    span 2; aspect-ratio: unset; }
+    .cell.wfull { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
+
+    .cell-label {
+      position: absolute;
+      bottom: 0.5rem;
+      left: 0.6rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #fff;
+      mix-blend-mode: difference;
+      opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+    }
+    .cell:hover .cell-label { opacity: 1; }
+
+    /* ===========================
+       MEMBERS
+    =========================== */
+    .members {
+      border-bottom: var(--bw) solid var(--fg);
+      padding: 2rem 1rem;
+    }
+    .members-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: var(--gap);
+    }
+    .member { border: var(--bw) solid var(--fg); }
+    .member-photo {
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: #D8D8D5;
+      border-bottom: var(--bw) solid var(--fg);
+    }
+    .member-photo img { background: #D8D8D5; }
+    .member-info { padding: 0.5rem 0.6rem; }
+    .member-name { font-size: 0.8rem; font-weight: bold; letter-spacing: 0.04em; }
+    .member-role { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: #888; margin-top: 0.15rem; }
+
+    /* ===========================
+       INFO
+    =========================== */
+    .info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: var(--bw) solid var(--fg);
+    }
+    .info-block { padding: 2rem 1rem; }
+    .info-block + .info-block { border-left: var(--bw) solid var(--fg); }
+    .info-label { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: #888; margin-bottom: 1rem; }
+    .info-text { font-size: 0.85rem; line-height: 1.85; color: #333; }
+    .info-text a { text-decoration: underline; }
+
+    /* ===========================
+       FOOTER
+    =========================== */
+    footer {
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+    }
+    .footer-logo img {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+      background: transparent;
+      opacity: 0.45;
+    }
+
+    /* ===========================
+       RESPONSIVE
+    =========================== */
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .cell.w2    { grid-column: span 2; }
+      .cell.w3    { grid-column: span 2; }
+      .cell.h2    { grid-row: span 1; aspect-ratio: 1; }
+      .cell.wfull { aspect-ratio: 4 / 3; }
+      .info { grid-template-columns: 1fr; }
+      .info-block + .info-block { border-left: none; border-top: var(--bw) solid var(--fg); }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .hero-sub { text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <!--
+        ロゴ画像: アートボード_1_1_.png を同じフォルダに置いてください
+        例: src="アートボード_1_1_.png"
+      -->
+      <img src="アートボード_1_1_.png" alt="OOPartsArts" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="#works">Works</a></li>
+      <li><a href="#members">Members</a></li>
+      <li><a href="#info">Info</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-logo">
+      <img src="アートボード_1_1_.png" alt="OOPartsArts" />
+    </div>
+    <p class="hero-sub">
+      Tokyo<br />
+      Collective of creators<br />
+      designers &amp; makers
+    </p>
+  </div>
+
+  <!-- IMAGE GRID ─────────────────────────────
+       .cell の中に <img src="…" alt="…"> を入れてください。
+       クラスでサイズを変えられます:
+         (なし)  : 1×1
+         w2      : 横2列
+         w3      : 横3列
+         wfull   : 全幅
+         h2      : 縦2行
+  ─────────────────────────────────────────── -->
+  <section class="grid" id="works">
+
+    <div class="cell wfull">
+      <img src="" alt="メインビジュアル" />
+      <span class="cell-label">2024</span>
+    </div>
+
+    <div class="cell h2">
+      <img src="" alt="作品 A" />
+      <span class="cell-label">Work A</span>
+    </div>
+    <div class="cell">
+      <img src="" alt="作品 B" />
+      <span class="cell-label">Work B</span>
+    </div>
+    <div class="cell">
+      <img src="" alt="作品 C" />
+      <span class="cell-label">Work C</span>
+    </div>
+    <div class="cell w2">
+      <img src="" alt="作品 D" />
+      <span class="cell-label">Work D</span>
+    </div>
+
+    <div class="cell">
+      <img src="" alt="作品 E" />
+      <span class="cell-label">Work E</span>
+    </div>
+    <div class="cell">
+      <img src="" alt="作品 F" />
+      <span class="cell-label">Work F</span>
+    </div>
+    <div class="cell">
+      <img src="" alt="作品 G" />
+      <span class="cell-label">Work G</span>
+    </div>
+    <div class="cell">
+      <img src="" alt="作品 H" />
+      <span class="cell-label">Work H</span>
+    </div>
+
+    <div class="cell w3">
+      <img src="" alt="作品 I" />
+      <span class="cell-label">Work I</span>
+    </div>
+    <div class="cell">
+      <img src="" alt="作品 J" />
+      <span class="cell-label">Work J</span>
+    </div>
+
+    <div class="cell wfull">
+      <img src="" alt="作品 K" />
+      <span class="cell-label">Work K</span>
+    </div>
+
+    <div class="cell">
+      <img src="" alt="作品 L" />
+      <span class="cell-label">Work L</span>
+    </div>
+    <div class="cell">
+      <img src="" alt="作品 M" />
+      <span class="cell-label">Work M</span>
+    </div>
+    <div class="cell w2">
+      <img src="" alt="作品 N" />
+      <span class="cell-label">Work N</span>
+    </div>
+
+  </section>
+
+  <!-- MEMBERS -->
+  <section class="members" id="members">
+    <p class="members-title">Members</p>
+    <div class="members-grid">
+
+      <div class="member">
+        <div class="member-photo"><img src="" alt="メンバー A" /></div>
+        <div class="member-info">
+          <p class="member-name">名前 A</p>
+          <p class="member-role">Designer</p>
+        </div>
+      </div>
+
+      <div class="member">
+        <div class="member-photo"><img src="" alt="メンバー B" /></div>
+        <div class="member-info">
+          <p class="member-name">名前 B</p>
+          <p class="member-role">Photographer</p>
+        </div>
+      </div>
+
+      <div class="member">
+        <div class="member-photo"><img src="" alt="メンバー C" /></div>
+        <div class="member-info">
+          <p class="member-name">名前 C</p>
+          <p class="member-role">Illustrator</p>
+        </div>
+      </div>
+
+      <div class="member">
+        <div class="member-photo"><img src="" alt="メンバー D" /></div>
+        <div class="member-info">
+          <p class="member-name">名前 D</p>
+          <p class="member-role">Writer</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <div class="info" id="info">
+    <div class="info-block">
+      <p class="info-label">About</p>
+      <p class="info-text">
+        チームの紹介文をここに書いてください。<br />
+        何をしているチームで、どんなものを作っているか。<br />
+        2〜3文で。
+      </p>
+    </div>
+    <div class="info-block">
+      <p class="info-label">Contact</p>
+      <p class="info-text">
+        <a href="mailto:hello@example.com">hello@example.com</a><br />
+        Instagram: <a href="https://instagram.com/" target="_blank">@handle</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">
+      <img src="アートボード_1_1_.png" alt="OOPartsArts" />
+    </span>
+    <span>© 2026 OOPartsArts</span>
+  </footer>
+
+</body>
+</html>
