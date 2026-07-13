@@ -6,21 +6,30 @@
   <title>OOPartsArts</title>
   <style>
     :root {
-      --bg:  #F8F8F6;
+      --bg:  #F4F4F0;
       --fg:  #111;
-      --gap: 3px;
-      --bw:  2px;
+      --gap: 16px; /* スッキリ見せるために少し広げました */
+      --bw:  1px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    html, body { height: 100%; scroll-behavior: smooth; }
+    
     body {
       background: var(--bg);
       color: var(--fg);
-      font-family: 'Courier New', Courier, monospace;
+      font-family: "MS UI Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+      position: relative;
+      background-image: 
+        linear-gradient(rgba(17, 17, 17, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17, 17, 17, 0.02) 1px, transparent 1px);
+      background-size: 20px 20px;
     }
-    a { color: inherit; text-decoration: none; }
-    img {
+    
+    a { color: inherit; text-decoration: none; cursor: pointer; }
+    a:hover { text-decoration: underline; }
+
+    img, video {
       display: block;
       width: 100%;
       height: 100%;
@@ -29,204 +38,175 @@
     }
 
     /* ===========================
-       NAV
+        NAV (ホワイトストーン風にシンプルに透過)
     =========================== */
     nav {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: var(--bg);
-      border-bottom: var(--bw) solid var(--fg);
-      padding: 0.5rem 1rem;
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      z-index: 100;
+      background: rgba(244, 244, 240, 0.85);
+      backdrop-filter: blur(5px);
+      border-bottom: var(--bw) dashed var(--fg);
+      padding: 1.2rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    /* ロゴ画像 — 手描きの傾きをそのまま活かす */
-    .nav-logo img {
-      height: 44px;
-      width: auto;
-      object-fit: contain;
-      background: transparent;
-      display: block;
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-    }
-    .nav-links a {
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-    .nav-links a:hover { text-decoration: underline; }
+    .nav-logo img { height: 32px; width: auto; object-fit: contain; background: transparent; display: block; }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; }
+    .nav-links a { font-size: 1.2rem; font-weight: bold; letter-spacing: 0.05em;}
 
     /* ===========================
-       HERO
+        HERO SLIDESHOW (全面スライドショー)
     =========================== */
-    .hero {
-      border-bottom: var(--bw) solid var(--fg);
-      padding: 3rem 1rem 2.5rem;
+    .hero-slider {
+      position: relative;
+      width: 100%;
+      height: 90vh; /* 画面の9割を占める大迫力サイズ */
+      overflow: hidden;
+      border-bottom: var(--bw) dashed var(--fg);
+      margin-top: 48px; /* Navの高さ分空ける */
+    }
+    .slider-wrapper {
       display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 2rem;
-      flex-wrap: wrap;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .slide {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.03); /* 動画や画像にうっすらフィルターをかけてインディーズ感を */
+      pointer-events: none;
     }
 
-    /* ヒーローにもロゴを大きく */
-    .hero-logo img {
-      height: clamp(80px, 16vw, 160px);
-      width: auto;
-      object-fit: contain;
+    /* スライド上の文字 */
+    .slide-info {
+      position: absolute;
+      bottom: 2rem;
+      left: 1rem;
+      color: #fff;
+      mix-blend-mode: difference; /* 背景の色に応じて文字が反転するアート演出 */
+      z-index: 2;
+    }
+    .slide-title { font-size: 1.2rem; font-weight: bold; letter-spacing: 0.05em; text-transform: uppercase; }
+    .slide-sub { font-size: 0.75rem; font-family: monospace; margin-top: 0.2rem; opacity: 0.8; }
+
+    /* スライドのインジケーター */
+    .slider-dots {
+      position: absolute;
+      bottom: 2rem;
+      right: 1rem;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border: 1px solid var(--fg);
       background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
     }
-
-    .hero-sub {
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #666;
-      text-align: right;
-      line-height: 1.9;
-    }
+    .dot.is-active { background: var(--fg); }
 
     /* ===========================
-       IMAGE GRID
+        MAIN GRID
     =========================== */
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: var(--gap);
       padding: var(--gap);
-      border-bottom: var(--bw) solid var(--fg);
+      border-bottom: var(--bw) dashed var(--fg);
     }
-
     .cell {
       position: relative;
       overflow: hidden;
-      background: #D8D8D5;
+      background: #E2E2DF;
       aspect-ratio: 1;
+      border: var(--bw) dashed var(--fg); 
+      padding: 4px;
+      background-clip: content-box;
     }
+    .cell img {
+      filter: grayscale(0.1) contrast(1.05);
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+    .cell:hover img { filter: grayscale(1) contrast(1.1); transform: scale(1.02); }
+    
     .cell.w2    { grid-column: span 2; }
     .cell.w3    { grid-column: span 3; }
     .cell.h2    { grid-row:    span 2; aspect-ratio: unset; }
-    .cell.wfull { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
+    .cell.wfull { grid-column: 1 / -1; aspect-ratio: 16 / 8; }
 
     .cell-label {
       position: absolute;
-      bottom: 0.5rem;
-      left: 0.6rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #fff;
-      mix-blend-mode: difference;
+      top: 12px; left: 12px;
+      font-size: 0.7rem;
+      background: var(--fg);
+      color: var(--bg);
+      padding: 2px 6px;
       opacity: 0;
-      transition: opacity 0.15s;
+      transition: opacity 0.2s;
       pointer-events: none;
+      font-family: monospace;
     }
-    .cell:hover .cell-label { opacity: 1; }
+    .cell:hover .cell-label { opacity: 0.9; }
 
     /* ===========================
-       MEMBERS
+        MEMBERS
     =========================== */
-    .members {
-      border-bottom: var(--bw) solid var(--fg);
-      padding: 2rem 1rem;
-    }
-    .members-title {
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 1.5rem;
-    }
-    .members-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: var(--gap);
-    }
-    .member { border: var(--bw) solid var(--fg); }
-    .member-photo {
-      aspect-ratio: 3 / 4;
-      overflow: hidden;
-      background: #D8D8D5;
-      border-bottom: var(--bw) solid var(--fg);
-    }
-    .member-photo img { background: #D8D8D5; }
-    .member-info { padding: 0.5rem 0.6rem; }
-    .member-name { font-size: 0.8rem; font-weight: bold; letter-spacing: 0.04em; }
-    .member-role { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: #888; margin-top: 0.15rem; }
+    .members { border-bottom: var(--bw) dashed var(--fg); padding: 4rem 1rem; }
+    .members-title { font-size: 0.75rem; font-weight: bold; margin-bottom: 2rem; }
+    .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--gap); }
+    .member { border: var(--bw) dashed var(--fg); padding: 4px; background: var(--bg); }
+    .member-photo { aspect-ratio: 3 / 4; overflow: hidden; border-bottom: var(--bw) dashed var(--fg); }
+    .member:hover .member-photo img { filter: grayscale(1); }
+    .member-info { padding: 0.6rem 0.2rem 0.2rem; }
+    .member-name { font-size: 0.8rem; font-weight: bold; }
+    .member-role { font-size: 0.7rem; color: #666; margin-top: 0.2rem; font-family: monospace; }
 
     /* ===========================
-       INFO
+        INFO
     =========================== */
-    .info {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border-bottom: var(--bw) solid var(--fg);
-    }
-    .info-block { padding: 2rem 1rem; }
-    .info-block + .info-block { border-left: var(--bw) solid var(--fg); }
-    .info-label { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: #888; margin-bottom: 1rem; }
-    .info-text { font-size: 0.85rem; line-height: 1.85; color: #333; }
-    .info-text a { text-decoration: underline; }
+    .info { display: grid; grid-template-columns: 1fr 1fr; border-bottom: var(--bw) dashed var(--fg); }
+    .info-block { padding: 4rem 1rem; }
+    .info-block + .info-block { border-left: var(--bw) dashed var(--fg); }
+    .info-label { font-size: 0.75rem; font-weight: bold; margin-bottom: 1.5rem; }
+    .info-text { font-size: 0.85rem; line-height: 1.9; color: #222; }
 
     /* ===========================
-       FOOTER
+        FOOTER
     =========================== */
-    footer {
-      padding: 0.8rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #888;
-    }
-    .footer-logo img {
-      height: 28px;
-      width: auto;
-      object-fit: contain;
-      background: transparent;
-      opacity: 0.45;
-    }
+    footer { padding: 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #666; }
+    .footer-logo img { height: 24px; width: auto; opacity: 0.3; }
 
     /* ===========================
-       RESPONSIVE
+        RESPONSIVE
     =========================== */
     @media (max-width: 640px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-slider { height: 60vh; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
       .cell.w2    { grid-column: span 2; }
       .cell.w3    { grid-column: span 2; }
       .cell.h2    { grid-row: span 1; aspect-ratio: 1; }
       .cell.wfull { aspect-ratio: 4 / 3; }
       .info { grid-template-columns: 1fr; }
-      .info-block + .info-block { border-left: none; border-top: var(--bw) solid var(--fg); }
-      .hero { flex-direction: column; align-items: flex-start; }
-      .hero-sub { text-align: left; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { transition: none !important; }
+      .info-block + .info-block { border-left: none; border-top: var(--bw) dashed var(--fg); }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
   <nav>
-    <a href="#" class="nav-logo">
-      <!--
-
-      -->
-      <img src="logo.png" alt="OOPartsArts" />
-    </a>
+    <a href="#" class="nav-logo"><img src="logo.png" alt="OOPartsArts" /></a>
     <ul class="nav-links">
       <li><a href="#works">Works</a></li>
       <li><a href="#members">Members</a></li>
@@ -234,163 +214,153 @@
     </ul>
   </nav>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-logo">
-      <img src="logo.png" alt="OOPartsArts" />
-    </div>
-    <p class="hero-sub">
-      Tokyo<br />
-      Collective of creators<br />
-      designers &amp; makers
-    </p>
+  <div class="hero-slider" id="hero-slider">
+    <div class="slider-wrapper" id="slider-wrapper"></div>
+    <div class="slider-dots" id="slider-dots"></div>
   </div>
 
-  <!-- IMAGE GRID ─────────────────────────────
-       .cell の中に <img src="…" alt="…"> を入れてください。
-       クラスでサイズを変えられます:
-         (なし)  : 1×1
-         w2      : 横2列
-         w3      : 横3列
-         wfull   : 全幅
-         h2      : 縦2行
-  ─────────────────────────────────────────── -->
-  <section class="grid" id="works">
+  <section class="grid" id="works"></section>
 
-    <div class="cell wfull">
-      <img src="" alt="メインビジュアル" />
-      <span class="cell-label">2024</span>
-    </div>
-
-    <div class="cell h2">
-      <img src="" alt="作品 A" />
-      <span class="cell-label">Work A</span>
-    </div>
-    <div class="cell">
-      <img src="" alt="作品 B" />
-      <span class="cell-label">Work B</span>
-    </div>
-    <div class="cell">
-      <img src="" alt="作品 C" />
-      <span class="cell-label">Work C</span>
-    </div>
-    <div class="cell w2">
-      <img src="" alt="作品 D" />
-      <span class="cell-label">Work D</span>
-    </div>
-
-    <div class="cell">
-      <img src="" alt="作品 E" />
-      <span class="cell-label">Work E</span>
-    </div>
-    <div class="cell">
-      <img src="" alt="作品 F" />
-      <span class="cell-label">Work F</span>
-    </div>
-    <div class="cell">
-      <img src="" alt="作品 G" />
-      <span class="cell-label">Work G</span>
-    </div>
-    <div class="cell">
-      <img src="" alt="作品 H" />
-      <span class="cell-label">Work H</span>
-    </div>
-
-    <div class="cell w3">
-      <img src="" alt="作品 I" />
-      <span class="cell-label">Work I</span>
-    </div>
-    <div class="cell">
-      <img src="" alt="作品 J" />
-      <span class="cell-label">Work J</span>
-    </div>
-
-    <div class="cell wfull">
-      <img src="" alt="作品 K" />
-      <span class="cell-label">Work K</span>
-    </div>
-
-    <div class="cell">
-      <img src="" alt="作品 L" />
-      <span class="cell-label">Work L</span>
-    </div>
-    <div class="cell">
-      <img src="" alt="作品 M" />
-      <span class="cell-label">Work M</span>
-    </div>
-    <div class="cell w2">
-      <img src="" alt="作品 N" />
-      <span class="cell-label">Work N</span>
-    </div>
-
-  </section>
-
-  <!-- MEMBERS -->
   <section class="members" id="members">
     <p class="members-title">Members</p>
-    <div class="members-grid">
-
-      <div class="member">
-        <div class="member-photo"><img src="" alt="メンバー A" /></div>
-        <div class="member-info">
-          <p class="member-name">名前 A</p>
-          <p class="member-role">Designer</p>
-        </div>
-      </div>
-
-      <div class="member">
-        <div class="member-photo"><img src="" alt="メンバー B" /></div>
-        <div class="member-info">
-          <p class="member-name">名前 B</p>
-          <p class="member-role">Photographer</p>
-        </div>
-      </div>
-
-      <div class="member">
-        <div class="member-photo"><img src="" alt="メンバー C" /></div>
-        <div class="member-info">
-          <p class="member-name">名前 C</p>
-          <p class="member-role">Illustrator</p>
-        </div>
-      </div>
-
-      <div class="member">
-        <div class="member-photo"><img src="" alt="メンバー D" /></div>
-        <div class="member-info">
-          <p class="member-name">名前 D</p>
-          <p class="member-role">Writer</p>
-        </div>
-      </div>
-
-    </div>
+    <div class="members-grid" id="members-grid"></div>
   </section>
 
-  <!-- INFO -->
   <div class="info" id="info">
     <div class="info-block">
       <p class="info-label">About</p>
-      <p class="info-text">
-        チームの紹介文をここに書いてください。<br />
-        何をしているチームで、どんなものを作っているか。<br />
-        2〜3文で。
-      </p>
+      <p class="info-text" id="about-text"></p>
     </div>
     <div class="info-block">
       <p class="info-label">Contact</p>
-      <p class="info-text">
-        <a href="mailto:hello@example.com">hello@example.com</a><br />
-        Instagram: <a href="https://instagram.com/" target="_blank">@handle</a>
-      </p>
+      <p class="info-text" id="contact-text"></p>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer>
-    <span class="footer-logo">
-      <img src="logo.png" alt="OOPartsArts" />
-    </span>
+    <span class="footer-logo"><img src="logo.png" alt="OOPartsArts" /></span>
     <span>© 2026 OOPartsArts</span>
   </footer>
 
+  <script>
+    const siteData = {
+      // トップに大きく見せるスライド（画像や動画のパスを指定）
+      "heroSlides": [
+        { "type": "image", "url": "logo.png", "title": "OOPartsArts Tokyo", "sub": "Collective of creators, designers & makers" },
+        // もし動画にする場合は type を "video" にして以下のように追加できます
+        // { "type": "video", "url": "video.mp4", "title": "Exhibition 2026", "sub": "Moving images and sounds" },
+        { "type": "image", "url": "", "title": "New Archives", "sub": "Selected recording & visual artifacts" }
+      ],
+      "works": [
+        { "title": "作品 A", "imageUrl": "", "label": "Work A", "gridClass": "h2" },
+        { "title": "作品 B", "imageUrl": "", "label": "Work B", "gridClass": "" },
+        { "title": "作品 C", "imageUrl": "", "label": "Work C", "gridClass": "" },
+        { "title": "作品 D", "imageUrl": "", "label": "Work D", "gridClass": "w2" },
+        { "title": "作品 E", "imageUrl": "", "label": "Work E", "gridClass": "" },
+        { "title": "作品 F", "imageUrl": "", "label": "Work F", "gridClass": "" },
+        { "title": "作品 G", "imageUrl": "", "label": "Work G", "gridClass": "" },
+        { "title": "作品 H", "imageUrl": "", "label": "Work H", "gridClass": "" },
+        { "title": "作品 I", "imageUrl": "", "label": "Work I", "gridClass": "w3" },
+        { "title": "作品 J", "imageUrl": "", "label": "Work J", "gridClass": "" },
+        { "title": "作品 K", "imageUrl": "", "label": "Work K", "gridClass": "wfull" },
+        { "title": "作品 L", "imageUrl": "", "label": "Work L", "gridClass": "" },
+        { "title": "作品 M", "imageUrl": "", "label": "Work M", "gridClass": "" },
+        { "title": "作品 N", "imageUrl": "", "label": "Work N", "gridClass": "w2" }
+      ],
+      "members": [
+        { "name": "名前 A", "role": "Designer", "photoUrl": "" },
+        { "name": "名前 B", "role": "Photographer", "photoUrl": "" },
+        { "name": "名前 C", "role": "Illustrator", "photoUrl": "" },
+        { "name": "名前 D", "role": "Writer", "photoUrl": "" }
+      ],
+      "info": {
+        "about": "チームの紹介文をここに書いてください。<br />何をしているチームで、どんなものを作っているか。<br />2〜3文で。",
+        "email": "hello@example.com",
+        "instagramUrl": "https://instagram.com/",
+        "instagramHandle": "@handle"
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      
+      // 1. HERO SLIDER の生成
+      const sliderWrapper = document.getElementById("slider-wrapper");
+      const dotsContainer = document.getElementById("slider-dots");
+      
+      sliderWrapper.innerHTML = siteData.heroSlides.map(slide => {
+        let mediaHtml = '';
+        if (slide.type === 'video') {
+          mediaHtml = `<video src="${slide.url}" autoplay loop muted playsinline></video>`;
+        } else {
+          mediaHtml = `<img src="${slide.url}" alt="${slide.title}" />`;
+        }
+        return `
+          <div class="slide">
+            ${mediaHtml}
+            <div class="slide-info">
+              <h2 class="slide-title">${slide.title}</h2>
+              <p class="slide-sub">${slide.sub}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      dotsContainer.innerHTML = siteData.heroSlides.map((_, i) => `
+        <span class="dot ${i === 0 ? 'is-active' : ''}" data-index="${i}"></span>
+      `).join('');
+
+      // スライドショーの自動再生・手動切り替え制御
+      let currentSlide = 0;
+      const totalSlides = siteData.heroSlides.length;
+      const dots = document.querySelectorAll('.dot');
+
+      function goToSlide(index) {
+        currentSlide = index;
+        sliderWrapper.style.transform = `translate3d(-${currentSlide * 100}%, 0, 0)`;
+        dots.forEach((d, i) => d.classList.toggle('is-active', i === currentSlide));
+      }
+
+      // 自動スライド (5秒ごと)
+      let slideInterval = setInterval(() => {
+        goToSlide((currentSlide + 1) % totalSlides);
+      }, 3000);
+
+      // ドットクリックイベント
+      dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+          clearInterval(slideInterval);
+          goToSlide(parseInt(e.target.dataset.index));
+        });
+      });
+
+      // 2. WORKS GRID の生成
+      const gridContainer = document.getElementById("works");
+      gridContainer.innerHTML = siteData.works.map(work => `
+        <div class="cell ${work.gridClass}">
+          <img src="${work.imageUrl}" alt="${work.title}" />
+          <span class="cell-label">${work.label}</span>
+        </div>
+      `).join('');
+
+      // 3. MEMBERS の生成
+      const membersContainer = document.getElementById("members-grid");
+      membersContainer.innerHTML = siteData.members.map(member => `
+        <div class="member">
+          <div class="member-photo"><img src="${member.photoUrl}" alt="${member.name}" /></div>
+          <div class="member-info">
+            <p class="member-name">${member.name}</p>
+            <p class="member-role">${member.role}</p>
+          </div>
+        </div>
+      `).join('');
+
+      // 4. ABOUT & CONTACT
+      document.getElementById("about-text").innerHTML = siteData.info.about;
+      document.getElementById("contact-text").innerHTML = `
+        <a href="mailto:${siteData.info.email}">${siteData.info.email}</a><br />
+        Instagram: <a href="${siteData.info.instagramUrl}" target="_blank">${siteData.info.instagramHandle}</a>
+      `;
+    });
+  </script>
 </body>
 </html>
