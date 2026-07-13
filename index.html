@@ -8,8 +8,8 @@
     :root {
       --bg:  #F4F4F0;
       --fg:  #111;
-      --gap: 16px; /* スッキリ見せるために少し広げました */
-      --bw:  1px;
+      --gap: 20px; 
+      --max-width: 1000px; /* 全コンテンツの美しさを統一する中央最大幅 */
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,7 +38,7 @@
     }
 
     /* ===========================
-        NAV (ホワイトストーン風にシンプルに透過)
+        NAV
     =========================== */
     nav {
       position: fixed;
@@ -46,7 +46,7 @@
       z-index: 100;
       background: rgba(244, 244, 240, 0.85);
       backdrop-filter: blur(5px);
-      border-bottom: var(--bw) dashed var(--fg);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
       padding: 1.2rem 1.5rem;
       display: flex;
       justify-content: space-between;
@@ -57,15 +57,20 @@
     .nav-links a { font-size: 1.2rem; font-weight: bold; letter-spacing: 0.05em;}
 
     /* ===========================
-        HERO SLIDESHOW (全面スライドショー)
+        COMPACT HERO SLIDESHOW (上品なサイズ感＋サイドボタン)
     =========================== */
+    .hero-container {
+      max-width: var(--max-width);
+      margin: 80px auto 2rem; /* Navの下に上品に配置 */
+      padding: 0 1.5rem;
+      position: relative; /* 💡左右ボタンの基準点 */
+    }
     .hero-slider {
       position: relative;
       width: 100%;
-      height: 90vh; /* 画面の9割を占める大迫力サイズ */
+      height: 55vh; /* 💡90vhから55vhに落として、我が強すぎないサイズ感に */
       overflow: hidden;
-      border-bottom: var(--bw) dashed var(--fg);
-      margin-top: 48px; /* Navの高さ分空ける */
+      background: #E2E2DF;
     }
     .slider-wrapper {
       display: flex;
@@ -82,73 +87,99 @@
       content: '';
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.03); /* 動画や画像にうっすらフィルターをかけてインディーズ感を */
+      background: rgba(0, 0, 0, 0.02);
       pointer-events: none;
     }
-
-    /* スライド上の文字 */
     .slide-info {
       position: absolute;
       bottom: 2rem;
-      left: 1rem;
+      left: 2rem;
       color: #fff;
-      mix-blend-mode: difference; /* 背景の色に応じて文字が反転するアート演出 */
+      mix-blend-mode: difference;
       z-index: 2;
     }
     .slide-title { font-size: 1.2rem; font-weight: bold; letter-spacing: 0.05em; text-transform: uppercase; }
     .slide-sub { font-size: 0.75rem; font-family: monospace; margin-top: 0.2rem; opacity: 0.8; }
 
-    /* スライドのインジケーター */
+    /* 💡左右のナビゲーションボタン（レインボー恵さんのような配置イメージ） */
+    .slide-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-size: 1.5rem;
+      font-family: monospace;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 15;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .slide-btn:hover { opacity: 0.6; }
+    .slide-btn.prev { left: -35px; } /* スライドの少し外側に配置 */
+    .slide-btn.next { right: -35px; }
+
+    /* 下部のインジケーター（ドット） */
     .slider-dots {
       position: absolute;
-      bottom: 2rem;
-      right: 1rem;
+      bottom: 1.5rem;
+      right: 2rem;
       display: flex;
       gap: 8px;
       z-index: 10;
     }
     .dot {
-      width: 8px; height: 8px;
+      width: 6px; height: 6px;
       border: 1px solid var(--fg);
       background: transparent;
       cursor: pointer;
       border-radius: 50%;
+      transition: background 0.2s;
     }
     .dot.is-active { background: var(--fg); }
 
     /* ===========================
-        MAIN GRID
+        MAIN GRID (中央配置・ホバー動画対応)
     =========================== */
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--gap);
-      padding: var(--gap);
-      border-bottom: var(--bw) dashed var(--fg);
+      max-width: var(--max-width);
+      margin: 4rem auto;
+      padding: 0 1.5rem;
     }
     .cell {
       position: relative;
-      overflow: hidden;
+      overflow: visible; 
       background: #E2E2DF;
-      aspect-ratio: 1;
-      border: var(--bw) dashed var(--fg); 
-      padding: 4px;
-      background-clip: content-box;
+      aspect-ratio: 3 / 4; 
+      z-index: 1;
+      transition: z-index 0s;
     }
-    .cell img {
-      filter: grayscale(0.1) contrast(1.05);
-      transition: filter 0.3s ease, transform 0.3s ease;
+    .cell img, .cell video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
+      transform-origin: center;
     }
-    .cell:hover img { filter: grayscale(1) contrast(1.1); transform: scale(1.02); }
+    .cell:hover { z-index: 10; }
+    .cell:hover img, .cell:hover video { transform: scale(1.06); }
     
-    .cell.w2    { grid-column: span 2; }
-    .cell.w3    { grid-column: span 3; }
-    .cell.h2    { grid-row:    span 2; aspect-ratio: unset; }
-    .cell.wfull { grid-column: 1 / -1; aspect-ratio: 16 / 8; }
+    .cell.w2, .cell.w3 { grid-column: span 1; } 
+    .cell.h2    { grid-row: span 1; }
+    .cell.wfull { grid-column: 1 / -1; aspect-ratio: 16 / 7; } 
 
     .cell-label {
       position: absolute;
-      top: 12px; left: 12px;
+      top: 14px; left: 14px;
       font-size: 0.7rem;
       background: var(--fg);
       color: var(--bg);
@@ -157,49 +188,78 @@
       transition: opacity 0.2s;
       pointer-events: none;
       font-family: monospace;
+      z-index: 3;
     }
     .cell:hover .cell-label { opacity: 0.9; }
 
     /* ===========================
         MEMBERS
     =========================== */
-    .members { border-bottom: var(--bw) dashed var(--fg); padding: 4rem 1rem; }
+    .members { 
+      max-width: var(--max-width); 
+      margin: 0 auto; 
+      padding: 4rem 1.5rem; 
+    }
     .members-title { font-size: 0.75rem; font-weight: bold; margin-bottom: 2rem; }
     .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--gap); }
-    .member { border: var(--bw) dashed var(--fg); padding: 4px; background: var(--bg); }
-    .member-photo { aspect-ratio: 3 / 4; overflow: hidden; border-bottom: var(--bw) dashed var(--fg); }
-    .member:hover .member-photo img { filter: grayscale(1); }
-    .member-info { padding: 0.6rem 0.2rem 0.2rem; }
+    
+    .member { 
+      background: transparent; 
+      position: relative;
+      z-index: 1;
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), z-index 0s;
+    }
+    .member:hover { z-index: 10; transform: scale(1.05); } 
+    .member-photo { aspect-ratio: 3 / 4; overflow: hidden; margin-bottom: 0.8rem; } 
+    .member-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .member-info { padding: 0; }
     .member-name { font-size: 0.8rem; font-weight: bold; }
     .member-role { font-size: 0.7rem; color: #666; margin-top: 0.2rem; font-family: monospace; }
 
     /* ===========================
         INFO
     =========================== */
-    .info { display: grid; grid-template-columns: 1fr 1fr; border-bottom: var(--bw) dashed var(--fg); }
-    .info-block { padding: 4rem 1rem; }
-    .info-block + .info-block { border-left: var(--bw) dashed var(--fg); }
+    .info { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      border-top: 1px solid rgba(0,0,0,0.05); 
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .info-block { padding: 6rem 1.5rem; }
+    .info-block + .info-block { border-left: 1px solid rgba(0,0,0,0.05);}
     .info-label { font-size: 0.75rem; font-weight: bold; margin-bottom: 1.5rem; }
     .info-text { font-size: 0.85rem; line-height: 1.9; color: #222; }
 
     /* ===========================
         FOOTER
     =========================== */
-    footer { padding: 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #666; }
+    footer { 
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 2rem 1.5rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      font-size: 0.7rem; 
+      color: #666; 
+      border-top: 1px solid rgba(0,0,0,0.05); 
+    }
     .footer-logo img { height: 24px; width: auto; opacity: 0.3; }
 
     /* ===========================
         RESPONSIVE
     =========================== */
+    @media (max-width: 768px) {
+      .slide-btn.prev { left: 5px; color: #fff; mix-blend-mode: difference; } /* スマホ時は画面内に退避 */
+      .slide-btn.next { right: 5px; color: #fff; mix-blend-mode: difference; }
+    }
     @media (max-width: 640px) {
-      .hero-slider { height: 60vh; }
-      .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
-      .cell.w2    { grid-column: span 2; }
-      .cell.w3    { grid-column: span 2; }
-      .cell.h2    { grid-row: span 1; aspect-ratio: 1; }
-      .cell.wfull { aspect-ratio: 4 / 3; }
+      .hero-slider { height: 40vh; }
+      .grid { grid-template-columns: 1fr; gap: 20px; padding: 0 1.5rem; }
+      .cell.wfull { aspect-ratio: 3 / 4; } 
       .info { grid-template-columns: 1fr; }
-      .info-block + .info-block { border-left: none; border-top: var(--bw) dashed var(--fg); }
+      .info-block + .info-block { border-left: none; border-top: 1px solid rgba(0,0,0,0.05);}
     }
   </style>
 </head>
@@ -214,9 +274,13 @@
     </ul>
   </nav>
 
-  <div class="hero-slider" id="hero-slider">
-    <div class="slider-wrapper" id="slider-wrapper"></div>
-    <div class="slider-dots" id="slider-dots"></div>
+  <div class="hero-container">
+    <button class="slide-btn prev" id="slide-prev">&lt;</button>
+    <div class="hero-slider" id="hero-slider">
+      <div class="slider-wrapper" id="slider-wrapper"></div>
+      <div class="slider-dots" id="slider-dots"></div>
+    </div>
+    <button class="slide-btn next" id="slide-next">&gt;</button>
   </div>
 
   <section class="grid" id="works"></section>
@@ -244,28 +308,25 @@
 
   <script>
     const siteData = {
-      // トップに大きく見せるスライド（画像や動画のパスを指定）
       "heroSlides": [
         { "type": "image", "url": "logo.png", "title": "OOPartsArts Tokyo", "sub": "Collective of creators, designers & makers" },
-        // もし動画にする場合は type を "video" にして以下のように追加できます
-        // { "type": "video", "url": "video.mp4", "title": "Exhibition 2026", "sub": "Moving images and sounds" },
         { "type": "image", "url": "", "title": "New Archives", "sub": "Selected recording & visual artifacts" }
       ],
       "works": [
-        { "title": "作品 A", "imageUrl": "", "label": "Work A", "gridClass": "h2" },
-        { "title": "作品 B", "imageUrl": "", "label": "Work B", "gridClass": "" },
-        { "title": "作品 C", "imageUrl": "", "label": "Work C", "gridClass": "" },
-        { "title": "作品 D", "imageUrl": "", "label": "Work D", "gridClass": "w2" },
-        { "title": "作品 E", "imageUrl": "", "label": "Work E", "gridClass": "" },
-        { "title": "作品 F", "imageUrl": "", "label": "Work F", "gridClass": "" },
-        { "title": "作品 G", "imageUrl": "", "label": "Work G", "gridClass": "" },
-        { "title": "作品 H", "imageUrl": "", "label": "Work H", "gridClass": "" },
-        { "title": "作品 I", "imageUrl": "", "label": "Work I", "gridClass": "w3" },
-        { "title": "作品 J", "imageUrl": "", "label": "Work J", "gridClass": "" },
-        { "title": "作品 K", "imageUrl": "", "label": "Work K", "gridClass": "wfull" },
-        { "title": "作品 L", "imageUrl": "", "label": "Work L", "gridClass": "" },
-        { "title": "作品 M", "imageUrl": "", "label": "Work M", "gridClass": "" },
-        { "title": "作品 N", "imageUrl": "", "label": "Work N", "gridClass": "w2" }
+        { "type": "video", "url": "sample.mp4", "poster": "poster-a.jpg", "title": "作品 A", "label": "Work A", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 B", "label": "Work B", "gridClass": "" },
+        { "type": "video", "url": "sample2.mp4", "poster": "", "title": "作品 C", "label": "Work C", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 D", "label": "Work D", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 E", "label": "Work E", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 F", "label": "Work F", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 G", "label": "Work G", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 H", "label": "Work H", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 I", "label": "Work I", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 J", "label": "Work J", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 K", "label": "Work K", "gridClass": "wfull" }, 
+        { "type": "image", "url": "", "title": "作品 L", "label": "Work L", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 M", "label": "Work M", "gridClass": "" },
+        { "type": "image", "url": "", "title": "作品 N", "label": "Work N", "gridClass": "" }
       ],
       "members": [
         { "name": "名前 A", "role": "Designer", "photoUrl": "" },
@@ -309,38 +370,73 @@
         <span class="dot ${i === 0 ? 'is-active' : ''}" data-index="${i}"></span>
       `).join('');
 
-      // スライドショーの自動再生・手動切り替え制御
       let currentSlide = 0;
       const totalSlides = siteData.heroSlides.length;
       const dots = document.querySelectorAll('.dot');
 
       function goToSlide(index) {
-        currentSlide = index;
+        // インデックスのループ処理
+        currentSlide = (index + totalSlides) % totalSlides;
         sliderWrapper.style.transform = `translate3d(-${currentSlide * 100}%, 0, 0)`;
         dots.forEach((d, i) => d.classList.toggle('is-active', i === currentSlide));
       }
 
-      // 自動スライド (5秒ごと)
-      let slideInterval = setInterval(() => {
-        goToSlide((currentSlide + 1) % totalSlides);
-      }, 3000);
+      // 自動スライド制御（手動操作されたらリセット）
+      let slideInterval = setInterval(() => { goToSlide(currentSlide + 1); }, 4000);
+      function resetInterval() {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(() => { goToSlide(currentSlide + 1); }, 4000);
+      }
 
-      // ドットクリックイベント
+      // 💡 左右のナビゲーションボタンのクリックイベント
+      document.getElementById('slide-prev').addEventListener('click', () => {
+        goToSlide(currentSlide - 1);
+        resetInterval();
+      });
+      document.getElementById('slide-next').addEventListener('click', () => {
+        goToSlide(currentSlide + 1);
+        resetInterval();
+      });
+
+      // 下部ドットのクリックイベント
       dots.forEach(dot => {
         dot.addEventListener('click', (e) => {
-          clearInterval(slideInterval);
           goToSlide(parseInt(e.target.dataset.index));
+          resetInterval();
         });
       });
 
       // 2. WORKS GRID の生成
       const gridContainer = document.getElementById("works");
-      gridContainer.innerHTML = siteData.works.map(work => `
-        <div class="cell ${work.gridClass}">
-          <img src="${work.imageUrl}" alt="${work.title}" />
-          <span class="cell-label">${work.label}</span>
-        </div>
-      `).join('');
+      gridContainer.innerHTML = siteData.works.map(work => {
+        let mediaHtml = '';
+        if (work.type === 'video') {
+          mediaHtml = `<video src="${work.url}" poster="${work.poster || ''}" loop muted preload="metadata" playsinline></video>`;
+        } else {
+          mediaHtml = `<img src="${work.url}" alt="${work.title}" />`;
+        }
+        return `
+          <div class="cell ${work.gridClass}">
+            ${mediaHtml}
+            <span class="cell-label">${work.label}</span>
+          </div>
+        `;
+      }).join('');
+
+      // ホバーで動画を再生/停止する制御
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach(cell => {
+        const video = cell.querySelector('video');
+        if (video) {
+          cell.addEventListener('mouseenter', () => {
+            video.play().catch(err => console.log(err));
+          });
+          cell.addEventListener('mouseleave', () => {
+            video.pause();
+            video.currentTime = 0; 
+          });
+        }
+      });
 
       // 3. MEMBERS の生成
       const membersContainer = document.getElementById("members-grid");
@@ -354,7 +450,7 @@
         </div>
       `).join('');
 
-      // 4. ABOUT & CONTACT
+      // 4. ABOUT & CONTACT のデータ挿入
       document.getElementById("about-text").innerHTML = siteData.info.about;
       document.getElementById("contact-text").innerHTML = `
         <a href="mailto:${siteData.info.email}">${siteData.info.email}</a><br />
