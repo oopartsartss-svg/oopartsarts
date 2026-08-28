@@ -152,6 +152,11 @@
       object-fit: cover;
       transition: transform .6s var(--ease);
     }
+    /* サムネイル画像: 動画の上に重ねる */
+    .g-item .g-thumb {
+      z-index: 1;
+      transition: transform .6s var(--ease), opacity .3s;
+    }
     .g-item:hover img,
     .g-item:hover video { transform: scale(1.03); }
 
@@ -539,11 +544,10 @@ works.forEach(w => {
   item.className = `g-item ${w.gridClass}`;
 
   // 動画作品: thumb の有無にかかわらず <video> を使う
-  // thumb があれば poster として使用、なければ動画先頭 0.1s を表示
   if (w.type === 'video') {
-    const poster = w.thumb ? `poster="${w.thumb}"` : '';
     item.innerHTML = `
-      <video src="${w.url}" ${poster} muted loop playsinline preload="metadata"></video>
+      <video src="${w.url}" muted loop playsinline preload="metadata"></video>
+      ${w.thumb ? `<img class="g-thumb" src="${w.thumb}" alt="${w.title}" />` : ''}
       <div class="g-overlay">
         <p class="g-title">${w.title}</p>
         <p class="g-meta">${w.tag} &nbsp;${w.year}</p>
@@ -551,34 +555,30 @@ works.forEach(w => {
     `;
 
     const video = item.querySelector('video');
+    const thumbImg = item.querySelector('.g-thumb');
 
     // thumb がない場合: 0.1s にシークしてサムネイル代わりにする
     if (!w.thumb) {
-      const seekTo = () => {
-        video.currentTime = 0.1;
-      };
-      // 複数イベントで確実にシーク（ブラウザ・環境差異を吸収）
+      const seekTo = () => { video.currentTime = 0.1; };
       video.addEventListener('loadedmetadata', seekTo, { once: true });
       video.addEventListener('loadeddata',     seekTo, { once: true });
-      // すでにメタデータ読み込み済みの場合（キャッシュ等）
       if (video.readyState >= 1) seekTo();
-      // iOS等でpreloadが効かない場合: Intersection Observerで画面内に入ったらload()
       const ioThumb = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) {
-          video.load();
-          ioThumb.disconnect();
-        }
+        if (entries[0].isIntersecting) { video.load(); ioThumb.disconnect(); }
       }, { threshold: 0.1 });
       ioThumb.observe(item);
     }
 
-    // ホバーで再生 / 離れたら先頭に戻して停止
+    // ホバーで動画再生、thumbImg を隠す
     item.addEventListener('mouseenter', () => {
+      if (thumbImg) thumbImg.style.opacity = '0';
       video.play().catch(() => {});
     });
+    // 離れたら動画停止、thumbImg を戻す
     item.addEventListener('mouseleave', () => {
       video.pause();
       video.currentTime = w.thumb ? 0 : 0.1;
+      if (thumbImg) thumbImg.style.opacity = '1';
     });
 
   } else {
