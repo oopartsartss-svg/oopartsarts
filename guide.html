@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OOPartsArts — サイト編集ガイド</title>
+  <style>
+    :root {
+      --bg: #f7f7f5;
+      --ink: #111;
+      --muted: #888;
+      --line: #e0e0dc;
+      --accent: #111;
+      --code-bg: #1a1a1a;
+      --code-fg: #e8e8e4;
+      --highlight: #fff3b0;
+      --green: #e6f4ea;
+      --green-ink: #1a6630;
+      --red: #fdecea;
+      --red-ink: #8b1a1a;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── LAYOUT ── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 220px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+      padding: 28px 20px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+    .main {
+      margin-left: 220px;
+      padding: 60px 60px 120px;
+      max-width: 900px;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar-title {
+      font-size: 10px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .sidebar-logo {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: .04em; color: var(--ink);
+      margin-bottom: 28px;
+    }
+    .nav-group { margin-bottom: 24px; }
+    .nav-group-label {
+      font-size: 9px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .nav-item {
+      display: block;
+      font-size: 12px; color: #444;
+      text-decoration: none;
+      padding: 4px 0;
+      border-left: 2px solid transparent;
+      padding-left: 10px;
+      margin-left: -10px;
+      transition: color .15s, border-color .15s;
+    }
+    .nav-item:hover { color: var(--ink); border-color: var(--ink); }
+
+    /* ── CONTENT ── */
+    .page-title {
+      font-size: 28px; font-weight: 600;
+      letter-spacing: -.02em; margin-bottom: 8px;
+    }
+    .page-sub {
+      font-size: 13px; color: var(--muted);
+      margin-bottom: 60px;
+    }
+
+    h2 {
+      font-size: 18px; font-weight: 600;
+      letter-spacing: -.01em;
+      margin: 60px 0 20px;
+      padding-top: 60px;
+      border-top: 1px solid var(--line);
+    }
+    h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+    h3 {
+      font-size: 13px; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+      color: var(--muted); margin: 32px 0 12px;
+    }
+    p { color: #333; margin-bottom: 14px; max-width: 60ch; }
+    li { color: #333; margin-bottom: 6px; max-width: 60ch; }
+    ul, ol { padding-left: 18px; margin-bottom: 16px; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-radius: 4px;
+      padding: 14px 16px;
+      margin: 20px 0;
+      font-size: 13px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .callout.tip  { background: var(--green); color: var(--green-ink); }
+    .callout.warn { background: #fff8e1; color: #7a5c00; }
+    .callout.info { background: #e8f0fe; color: #1a3a7a; }
+    .callout-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .callout p { color: inherit; margin: 0; max-width: none; }
+
+    /* ── CODE ── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      border-radius: 6px;
+      padding: 20px 22px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      margin: 16px 0 24px;
+    }
+    code {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: #e8e8e4;
+      color: #222;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+    /* ── HIGHLIGHT ── */
+    .hl { background: var(--highlight); }
+
+    /* ── COMMENT in code ── */
+    .cm { color: #6a9955; }
+    .kw { color: #569cd6; }
+    .st { color: #ce9178; }
+    .nm { color: #9cdcfe; }
+
+    /* ── STEP ── */
+    .steps { list-style: none; padding: 0; counter-reset: step; }
+    .steps li {
+      counter-increment: step;
+      padding: 16px 16px 16px 52px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin-bottom: 10px;
+      position: relative;
+      background: #fff;
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute; left: 16px; top: 16px;
+      width: 24px; height: 24px;
+      background: var(--ink); color: #fff;
+      border-radius: 50%;
+      font-size: 11px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .steps li p { margin: 0; }
+
+    /* ── TABLE ── */
+    table {
+      width: 100%; border-collapse: collapse;
+      margin: 16px 0 24px; font-size: 13px;
+    }
+    th {
+      text-align: left; padding: 8px 12px;
+      font-size: 10px; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted);
+      border-bottom: 1px solid var(--line);
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    td code { white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-block;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 3px;
+      margin-right: 4px;
+    }
+    .badge-image { background: #e8f0fe; color: #1a3a7a; }
+    .badge-video { background: #fce8f3; color: #7a1a5c; }
+
+    /* ── VISUAL GRID PREVIEW ── */
+    .grid-preview {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 2px;
+      background: #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 12px 0 24px;
+      font-size: 9px;
+    }
+    .gp-cell {
+      background: #333; color: #aaa;
+      padding: 8px 4px; text-align: center;
+      letter-spacing: .06em;
+    }
+    .gp-cell.s-wide  { grid-column: span 8;  background: #2a5a9a; color: #afd; }
+    .gp-cell.s-tall  { grid-column: span 4;  background: #4a2a7a; color: #daf; }
+    .gp-cell.s-half  { grid-column: span 6;  background: #2a6a4a; color: #afd; }
+    .gp-cell.s-third { grid-column: span 4;  background: #6a4a2a; color: #fda; }
+    .gp-cell.s-full  { grid-column: span 12; background: #6a2a2a; color: #faa; }
+    .gp-cell.s-two3  { grid-column: span 8;  background: #2a6a6a; color: #aff; }
+    .gp-cell.s-one3  { grid-column: span 4;  background: #4a6a2a; color: #dfa; }
+
+    /* ── FOLDER ── */
+    .folder {
+      background: #fff; border: 1px solid var(--line);
+      border-radius: 6px; padding: 16px 20px;
+      margin: 16px 0; font-family: 'Courier New', monospace;
+      font-size: 12.5px; line-height: 2;
+    }
+    .folder .root { font-weight: 600; }
+    .folder .f { color: #555; }
+    .folder .d { color: var(--ink); font-weight: 600; }
+    .folder .new { color: #1a6630; }
+    .folder .indent { padding-left: 20px; }
+    .folder .indent2 { padding-left: 40px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 32px 20px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <p class="sidebar-logo">OOPartsArts</p>
+  <p class="sidebar-title">編集ガイド</p>
+
+  <div class="nav-group">
+    <p class="nav-group-label">はじめに</p>
+    <a href="#overview" class="nav-item">概要・ファイル構成</a>
+    <a href="#editor" class="nav-item">テキストエディタ</a>
+  </div>
+
+  <div class="nav-group">
+    <p class="nav-group-label">基本の編集</p>
+    <a href="#hero" class="nav-item">① ヒーロー動画</a>
+    <a href="#works" class="nav-item">② 作品を追加する</a>
+    <a href="#about" class="nav-item">③ About・連絡先</a>
+  </div>
+
+  <div class="nav-group">
+    <p class="nav-group-label">詳細</p>
+    <a href="#gridclass" class="nav-item">サイズの種類</a>
+    <a href="#files" class="nav-item">ファイルの置き場所</a>
+    <a href="#github" class="nav-item">GitHubへのアップ</a>
+    <a href="#faq" class="nav-item">よくある質問</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <h1 class="page-title">サイト編集ガイド</h1>
+  <p class="page-sub">コードが初めてでも読める。OOPartsArtsサイトの更新マニュアル。</p>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="overview">概要・ファイル構成</h2>
+
+  <p>このサイトは <code>index.html</code> という1つのファイルで動いています。編集するのは基本的にこのファイルだけです。</p>
+
+  <div class="folder">
+    <div class="root">📁 oopartsarts/（リポジトリのルート）</div>
+    <div class="indent">
+      <span class="f">📄 index.html</span>　← <strong>メインファイル。ここを編集する</strong><br>
+      <span class="f">🖼 logo.png</span>　← ロゴ画像<br>
+      <span class="f">🎬 hero.mp4</span>　← ヒーロー動画<br>
+      <span class="d">📁 images/</span>　← 作品の画像はここに入れる<br>
+      <div class="indent new">
+        <span class="f">🖼 work-a.jpg</span><br>
+        <span class="f">🖼 work-b.jpg</span><br>
+        <span class="f">…</span>
+      </div>
+      <span class="d">📁 videos/</span>　← 作品の動画はここに入れる<br>
+      <div class="indent new">
+        <span class="f">🎬 work-a.mp4</span><br>
+        <span class="f">…</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <p>画像・動画の<strong>ファイル名は英数字とハイフンだけ</strong>にしてください。日本語・スペース・括弧が入ると表示されないことがあります。<br>例: <code>live-2024.jpg</code> ✓ &nbsp; <code>ライブ 撮影(1).jpg</code> ✗</p>
+  </div>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="editor">テキストエディタの準備</h2>
+
+  <p><strong>VS Code（無料）</strong> をおすすめします。インストールすると、コードに色がついて見やすくなります。</p>
+
+  <ol class="steps">
+    <li><p><a href="https://code.visualstudio.com/" target="_blank">code.visualstudio.com</a> からVS Codeをダウンロード・インストール</p></li>
+    <li><p>VS Codeで <code>index.html</code> をドラッグ＆ドロップして開く</p></li>
+    <li><p>編集したら <strong>Cmd+S（Mac）/ Ctrl+S（Windows）</strong> で保存</p></li>
+    <li><p>ブラウザで <code>index.html</code> を開いて確認。GitHubにアップすると本番に反映される</p></li>
+  </ol>
+
+  <div class="callout tip">
+    <span class="callout-icon">✓</span>
+    <p>編集前に <code>index.html</code> を別名でコピーしておくと安心です。<br>例: <code>index_backup.html</code></p>
+  </div>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="hero">① ヒーロー動画を変える</h2>
+
+  <p>サイトを開いたとき最初に流れる動画です。<code>index.html</code> を開いて、以下の1行を探してください。</p>
+
+  <pre><code><span class="cm">&lt;!-- HERO --&gt;</span>
+&lt;section class=<span class="st">"hero"</span>&gt;
+  &lt;video <span class="hl">src="hero.mp4"</span> autoplay loop muted playsinline&gt;&lt;/video&gt;
+  ...</code></pre>
+
+  <p><code>src="hero.mp4"</code> の <strong>hero.mp4</strong> の部分を、使いたい動画のファイル名に変えます。</p>
+
+  <pre><code><span class="cm">&lt;!-- 例: live-2024.mp4 に変える場合 --&gt;</span>
+&lt;video src=<span class="st">"live-2024.mp4"</span> autoplay loop muted playsinline&gt;&lt;/video&gt;</code></pre>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <p>動画ファイルは <strong><code>index.html</code> と同じフォルダ</strong>（リポジトリのルート）に置いてください。<br>サブフォルダに入れた場合は <code>src="videos/live-2024.mp4"</code> のようにパスを書きます。</p>
+  </div>
+
+  <h3>推奨動画スペック</h3>
+  <table>
+    <tr><th>項目</th><th>推奨</th></tr>
+    <tr><td>形式</td><td><code>.mp4</code>（H.264）</td></tr>
+    <tr><td>解像度</td><td>1920×1080 以上</td></tr>
+    <tr><td>ファイルサイズ</td><td>30MB 以下が理想（大きいと読み込みが遅い）</td></tr>
+    <tr><td>長さ</td><td>10〜60秒程度（ループするので短くてOK）</td></tr>
+    <tr><td>音声</td><td>なし推奨（<code>muted</code> 属性で自動的にミュートされる）</td></tr>
+  </table>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="works">② 作品を追加・編集する</h2>
+
+  <p><code>index.html</code> の下の方、<code>&lt;script&gt;</code> タグの中に <strong><code>const works = [...]</code></strong> という部分があります。ここだけ編集すれば作品が増やせます。</p>
+
+  <pre><code><span class="kw">const</span> <span class="nm">works</span> = [
+  {
+    <span class="nm">gridClass</span>: <span class="st">"s-wide"</span>,   <span class="cm">// ← サイズ（後述）</span>
+    <span class="nm">type</span>:      <span class="st">"video"</span>,    <span class="cm">// ← "image" または "video"</span>
+    <span class="nm">title</span>:     <span class="st">"ライブ撮影"</span>, <span class="cm">// ← 作品タイトル</span>
+    <span class="nm">tag</span>:       <span class="st">"Film"</span>,     <span class="cm">// ← カテゴリ</span>
+    <span class="nm">year</span>:      <span class="st">"2024"</span>,     <span class="cm">// ← 年</span>
+    <span class="nm">thumb</span>:     <span class="st">"herosamune.jpg"</span>, <span class="cm">// ← ギャラリーのサムネイル画像</span>
+    <span class="nm">url</span>:       <span class="st">"tamasi1.mp4"</span>,    <span class="cm">// ← クリックしたとき表示するファイル</span>
+    <span class="nm">desc</span>:      <span class="st">"ライブ空間の記録。"</span>  <span class="cm">// ← 説明（短く）</span>
+  },
+  <span class="cm">// ↑ この {} のかたまりが1作品。, で区切って追加する</span>
+];</code></pre>
+
+  <h3>作品を新しく追加する手順</h3>
+
+  <ol class="steps">
+    <li><p>画像または動画ファイルを <code>images/</code> または <code>videos/</code> フォルダに入れる</p></li>
+    <li><p><code>index.html</code> を開き、<code>const works = [</code> の行を探す</p></li>
+    <li><p>既存の <code>{...},</code> の下に、以下のブロックをコピーして追加する</p></li>
+    <li><p>ファイル名・タイトル・タグ・年・説明を書き換えて保存</p></li>
+  </ol>
+
+  <pre><code>{
+  gridClass: <span class="st">"s-half"</span>,
+  type:  <span class="st">"image"</span>,
+  title: <span class="st">"新しい作品のタイトル"</span>,
+  tag:   <span class="st">"Photo"</span>,
+  year:  <span class="st">"2025"</span>,
+  thumb: <span class="st">"images/new-work.jpg"</span>,
+  url:   <span class="st">"images/new-work.jpg"</span>,
+  desc:  <span class="st">"短い説明を1〜2行で。"</span>
+},</code></pre>
+
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <p><strong>thumb</strong> はギャラリー一覧に表示されるサムネイル。<strong>url</strong> は作品をクリックしたときに大きく表示されるファイルです。同じファイルを指定してOKです。</p>
+  </div>
+
+  <h3>作品を削除する</h3>
+  <p>削除したい作品の <code>{...},</code> のブロック全体を選択して削除するだけです。</p>
+
+  <h3>並び順を変える</h3>
+  <p><code>works</code> 配列の中の順番がそのままギャラリーの上から左から順番になります。ブロックの順番を入れ替えれば並び順が変わります。</p>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="gridclass">サイズの種類（gridClass）</h2>
+
+  <p>作品のサイズは <code>gridClass</code> で指定します。7種類あります。</p>
+
+  <div class="grid-preview">
+    <div class="gp-cell s-wide">s-wide</div>
+    <div class="gp-cell s-tall">s-tall</div>
+    <div class="gp-cell s-full">s-full（全幅）</div>
+    <div class="gp-cell s-one3">s-one3</div>
+    <div class="gp-cell s-two3">s-two3</div>
+    <div class="gp-cell s-half">s-half</div>
+    <div class="gp-cell s-half">s-half</div>
+    <div class="gp-cell s-third">s-third</div>
+    <div class="gp-cell s-third">s-third</div>
+    <div class="gp-cell s-third">s-third</div>
+  </div>
+
+  <table>
+    <tr>
+      <th>gridClass</th>
+      <th>幅</th>
+      <th>比率</th>
+      <th>使いどころ</th>
+    </tr>
+    <tr>
+      <td><code>"s-wide"</code></td>
+      <td>8/12列（大）</td>
+      <td>16:9</td>
+      <td>メインの横長映像・写真</td>
+    </tr>
+    <tr>
+      <td><code>"s-tall"</code></td>
+      <td>4/12列</td>
+      <td>4:5</td>
+      <td>縦長の写真・ポートレート</td>
+    </tr>
+    <tr>
+      <td><code>"s-full"</code></td>
+      <td>12/12列（全幅）</td>
+      <td>21:8（横長）</td>
+      <td>インパクトのある1枚・区切り</td>
+    </tr>
+    <tr>
+      <td><code>"s-half"</code></td>
+      <td>6/12列（半幅）</td>
+      <td>3:2</td>
+      <td>2枚並べるとき</td>
+    </tr>
+    <tr>
+      <td><code>"s-third"</code></td>
+      <td>4/12列</td>
+      <td>1:1（正方形）</td>
+      <td>3枚並べるとき</td>
+    </tr>
+    <tr>
+      <td><code>"s-two3"</code></td>
+      <td>8/12列</td>
+      <td>3:2</td>
+      <td>s-one3 と組み合わせる</td>
+    </tr>
+    <tr>
+      <td><code>"s-one3"</code></td>
+      <td>4/12列</td>
+      <td>3:2</td>
+      <td>s-two3 の横に置く</td>
+    </tr>
+  </table>
+
+  <div class="callout tip">
+    <span class="callout-icon">✓</span>
+    <p>隣り合う作品の合計が <strong>12列になるとき</strong>、横に並びます。ならない場合は自動で次の行に折り返します。<br>例: <code>s-wide（8）+ s-tall（4）= 12</code> → 横並び</p>
+  </div>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="about">③ About・連絡先を変える</h2>
+
+  <h3>About テキスト</h3>
+  <p><code>index.html</code> の中で <code>&lt;!-- ABOUT --&gt;</code> を探してください。</p>
+
+  <pre><code><span class="cm">&lt;!-- ABOUT --&gt;</span>
+&lt;section id=<span class="st">"about"</span>&gt;
+  &lt;div class=<span class="st">"reveal"</span>&gt;
+    &lt;p class=<span class="st">"about-name"</span>&gt;<span class="hl">OOPartsArts</span>&lt;/p&gt;       <span class="cm">&lt;!-- チーム名 --&gt;</span>
+    &lt;p class=<span class="st">"about-location"</span>&gt;<span class="hl">Tokyo</span>&lt;/p&gt;            <span class="cm">&lt;!-- 拠点 --&gt;</span>
+    &lt;p class=<span class="st">"about-disciplines"</span>&gt;<span class="hl">Film / Music / Art</span>&lt;/p&gt; <span class="cm">&lt;!-- 活動領域 --&gt;</span>
+  &lt;/div&gt;
+  &lt;p class=<span class="st">"about-text reveal"</span>&gt;
+    <span class="hl">映像・音楽・アートを制作するクリエイティブチーム。</span>  <span class="cm">&lt;!-- 説明文 --&gt;</span>
+  &lt;/p&gt;
+&lt;/section&gt;</code></pre>
+
+  <p>黄色い部分を書き換えるだけです。</p>
+
+  <h3>連絡先</h3>
+  <p><code>&lt;!-- CONTACT --&gt;</code> の部分です。</p>
+
+  <pre><code><span class="cm">&lt;!-- CONTACT --&gt;</span>
+&lt;section id=<span class="st">"contact"</span>&gt;
+  ...
+  &lt;div class=<span class="st">"contact-links reveal"</span>&gt;
+    &lt;a href=<span class="st">"mailto:<span class="hl">hello@example.com</span>"</span> class=<span class="st">"contact-link"</span>&gt;<span class="hl">hello@example.com</span>&lt;/a&gt;
+    &lt;a href=<span class="st">"https://instagram.com/<span class="hl">handle</span>"</span> target=<span class="st">"_blank"</span> class=<span class="st">"contact-link"</span>&gt;Instagram&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+
+  <p>メールアドレスとInstagramのハンドルを自分のものに変えてください。</p>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="files">ファイルの置き場所</h2>
+
+  <p>画像・動画は GitHubリポジトリの中に置きます。<code>src=""</code> に書くパスはリポジトリのルートからの相対パスです。</p>
+
+  <table>
+    <tr><th>ファイルの置き場所</th><th>srcに書くパス</th></tr>
+    <tr>
+      <td>ルート直下 <code>work.jpg</code></td>
+      <td><code>"work.jpg"</code></td>
+    </tr>
+    <tr>
+      <td><code>images/</code> フォルダの中 <code>work.jpg</code></td>
+      <td><code>"images/work.jpg"</code></td>
+    </tr>
+    <tr>
+      <td><code>videos/</code> フォルダの中 <code>work.mp4</code></td>
+      <td><code>"videos/work.mp4"</code></td>
+    </tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <p>GitHubの無料プランはファイル1つあたり <strong>最大100MB</strong> まで。動画はなるべく圧縮してください。<br>HandBrakeというアプリ（無料）を使うとMP4を小さくできます。</p>
+  </div>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="github">GitHubへのアップ方法</h2>
+
+  <p>変更内容をサイトに反映させるには GitHubにファイルをアップロードします。</p>
+
+  <h3>Web画面から操作する場合（簡単）</h3>
+
+  <ol class="steps">
+    <li><p>GitHubのリポジトリを開く（<code>github.com/oopartsarts/oopartsarts</code>）</p></li>
+    <li><p><strong>index.html を更新する場合：</strong><br>
+      <code>index.html</code> をクリック → 鉛筆アイコン（Edit）→ 編集 → Commit changes
+    </p></li>
+    <li><p><strong>画像・動画を追加する場合：</strong><br>
+      <code>Add file</code> → <code>Upload files</code> → ファイルをドラッグ → Commit changes
+    </p></li>
+    <li><p>1〜2分待つと <code>https://oopartsartss-svg.github.io/oopartsarts/</code> に反映される</p></li>
+  </ol>
+
+  <div class="callout tip">
+    <span class="callout-icon">✓</span>
+    <p>反映されない場合は <strong>Ctrl+Shift+R（Cmd+Shift+R）</strong> でキャッシュをクリアしてリロードしてください。</p>
+  </div>
+
+  <!-- ───────────────────────────── -->
+  <h2 id="faq">よくある質問</h2>
+
+  <h3>Q. 画像が表示されない</h3>
+  <p>以下を確認してください。</p>
+  <ul>
+    <li>ファイル名に日本語・スペース・括弧が入っていないか</li>
+    <li><code>src=""</code> のパスが正しいか（大文字小文字も区別されます）</li>
+    <li>ファイルがGitHubに実際にアップロードされているか</li>
+  </ul>
+
+  <h3>Q. 動画が再生されない（スマホ）</h3>
+  <p>スマホのブラウザは <code>autoplay</code> 動画を <code>muted</code>（音なし）でないと再生しません。動画に音声が入っている場合は、動画編集ソフトで音声トラックを削除してから使ってください。</p>
+
+  <h3>Q. 作品の順番を変えたい</h3>
+  <p><code>const works = [...]</code> の中のブロック（<code>{...},</code>）の順番を入れ替えれば、ギャラリーの順番も変わります。</p>
+
+  <h3>Q. , （カンマ）を忘れた</h3>
+  <p>各作品ブロックの末尾には <code>,</code> が必要です。忘れるとサイトが真っ白になります。最後の作品だけカンマなしでも動きますが、つけておく方が安全です。</p>
+
+  <pre><code>  {
+    gridClass: "s-half",
+    ...
+    desc: "説明"
+  }<span class="hl">,</span>   <span class="cm">← このカンマを忘れずに</span>
+  {
+    ...
+  }
+</code></pre>
+
+  <h3>Q. 変更したら真っ白になった</h3>
+  <p>コードのどこかに書き間違いがあります。<code>index.html</code> を開いてVS Codeの赤いアンダーラインを探してください。バックアップを取っていた場合はそちらに戻してください。</p>
+
+  <h3>Q. タイトルをブラウザのタブに表示させたい</h3>
+  <p><code>index.html</code> の一番上の <code>&lt;title&gt;</code> タグを変えます。</p>
+  <pre><code>&lt;title&gt;<span class="hl">OOPartsArts</span>&lt;/title&gt;</code></pre>
+
+  <h3>Q. サイトのURLを変えたい</h3>
+  <p>GitHubのリポジトリ名がURLになります。Settings → Pages で確認できます。独自ドメインを使う場合は同じくSettings → Pages → Custom domain に入力してください。</p>
+
+</main>
+
+</body>
+</html>
