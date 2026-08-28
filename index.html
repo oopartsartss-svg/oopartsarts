@@ -513,7 +513,7 @@ const works = [
     title: "祈り/S級任務 MV",
     tag:   "Film",
     year:  "2026",
-    thumb: "images/inori-thumb.jpg",              // ← サムネイル画像があれば "images/inori-thumb.jpg" のように入れる
+    thumb: "images/inori_thumb.jpg",              // ← サムネイル画像があれば "images/inori-thumb.jpg" のように入れる
     url:   "videos/inori.mp4",              // ← 動画ファイルが決まったら "videos/inori.mp4" のように入れる
     desc:  "S級任務による2nd single",
     link:      "https://youtu.be/ZNnWMIWydQg?si=bMqPNx4Z7aQLtc12", // ← YouTubeのURLが決まったら入れる
@@ -554,9 +554,22 @@ works.forEach(w => {
 
     // thumb がない場合: 0.1s にシークしてサムネイル代わりにする
     if (!w.thumb) {
-      video.addEventListener('loadedmetadata', () => {
+      const seekTo = () => {
         video.currentTime = 0.1;
-      });
+      };
+      // 複数イベントで確実にシーク（ブラウザ・環境差異を吸収）
+      video.addEventListener('loadedmetadata', seekTo, { once: true });
+      video.addEventListener('loadeddata',     seekTo, { once: true });
+      // すでにメタデータ読み込み済みの場合（キャッシュ等）
+      if (video.readyState >= 1) seekTo();
+      // iOS等でpreloadが効かない場合: Intersection Observerで画面内に入ったらload()
+      const ioThumb = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          video.load();
+          ioThumb.disconnect();
+        }
+      }, { threshold: 0.1 });
+      ioThumb.observe(item);
     }
 
     // ホバーで再生 / 離れたら先頭に戻して停止
