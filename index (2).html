@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OOPartsArts</title>
+  <meta name="description" content="OOPartsArts — Film, Music, Art. Tokyo." />
+  <style>
+    /* ─────────────────────────────
+       TOKENS
+    ───────────────────────────── */
+    :root {
+      --bg:    #0c0c0c;
+      --fg:    #ffffff;
+      --muted: rgba(255,255,255,.38);
+      --line:  rgba(255,255,255,.08);
+      --f:     -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      --ease:  cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ─────────────────────────────
+       RESET
+    ───────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--f);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img, video {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { background: none; border: none; cursor: pointer; font: inherit; color: inherit; padding: 0; }
+
+    /* ─────────────────────────────
+       NAV
+    ───────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 22px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .nav-logo img {
+      height: 24px; width: auto;
+      object-fit: contain; background: transparent;
+      filter: invert(1); opacity: .9;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex; gap: 28px;
+    }
+    .nav-links a {
+      font-size: 11px; letter-spacing: .08em;
+      color: rgba(255,255,255,.5);
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: #fff; }
+
+    /* ─────────────────────────────
+       HERO
+       映像が主役。UIは最小限。
+    ───────────────────────────── */
+    .hero {
+      position: relative;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
+    .hero video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      /* 映像をそのまま見せる。暗くしすぎない */
+    }
+    /* 下部だけごく薄いグラデ — ロゴを読みやすくするため */
+    .hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 30%;
+      background: linear-gradient(transparent, rgba(0,0,0,.45));
+      pointer-events: none;
+    }
+    .hero-id {
+      position: absolute; bottom: 28px; left: 28px; z-index: 2;
+      font-size: 11px; letter-spacing: .06em;
+      color: rgba(255,255,255,.75);
+    }
+    .hero-scroll {
+      position: absolute; bottom: 28px; right: 28px; z-index: 2;
+      font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      writing-mode: vertical-rl;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-scroll::before {
+      content: '';
+      display: block; width: 1px; height: 40px;
+      background: rgba(255,255,255,.2);
+    }
+
+    /* ─────────────────────────────
+       WORKS
+    ───────────────────────────── */
+    #works { padding: 80px 0 120px; }
+
+    .works-label {
+      padding: 0 28px 40px;
+      font-size: 11px; letter-spacing: .08em;
+      color: var(--muted);
+    }
+
+    /* ギャラリーグリッド
+       作品ごとに異なるサイズ・リズム */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 3px;
+      padding: 0 3px;
+    }
+
+    .g-item {
+      position: relative;
+      overflow: hidden;
+      background: #111;
+      cursor: pointer;
+    }
+
+    /* サイズバリエーション */
+    .g-item.s-wide  { grid-column: span 8;  aspect-ratio: 16/9; }
+    .g-item.s-tall  { grid-column: span 4;  aspect-ratio: 4/5;  }
+    .g-item.s-half  { grid-column: span 6;  aspect-ratio: 3/2;  }
+    .g-item.s-third { grid-column: span 4;  aspect-ratio: 1;    }
+    .g-item.s-full  { grid-column: span 12; aspect-ratio: 21/8; }
+    .g-item.s-two3  { grid-column: span 8;  aspect-ratio: 3/2;  }
+    .g-item.s-one3  { grid-column: span 4;  aspect-ratio: 3/2;  }
+
+    .g-item img,
+    .g-item video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .6s var(--ease);
+    }
+    .g-item:hover img,
+    .g-item:hover video { transform: scale(1.03); }
+
+    /* ホバーで作品情報を表示 */
+    .g-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      padding: 16px 18px;
+      background: linear-gradient(transparent 50%, rgba(0,0,0,.6) 100%);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .g-item:hover .g-overlay { opacity: 1; }
+    .g-title {
+      font-size: 12px; letter-spacing: .04em;
+      color: rgba(255,255,255,.9);
+      margin-bottom: 3px;
+    }
+    .g-meta {
+      font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+    }
+
+    /* ─────────────────────────────
+       ABOUT
+    ───────────────────────────── */
+    #about {
+      padding: 80px 28px 100px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+    .about-name {
+      font-size: 13px; letter-spacing: .04em;
+      color: rgba(255,255,255,.9);
+      margin-bottom: 6px;
+    }
+    .about-location {
+      font-size: 11px; letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .about-disciplines {
+      font-size: 11px; letter-spacing: .06em;
+      color: var(--muted);
+    }
+    .about-text {
+      font-size: 13px; line-height: 1.7;
+      color: rgba(255,255,255,.45);
+      max-width: 38ch;
+    }
+
+    /* ─────────────────────────────
+       CONTACT
+    ───────────────────────────── */
+    #contact {
+      padding: 60px 28px 80px;
+      border-top: 1px solid var(--line);
+    }
+    .contact-label {
+      font-size: 11px; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 28px;
+    }
+    .contact-links {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .contact-link {
+      font-size: 13px; letter-spacing: .03em;
+      color: rgba(255,255,255,.6);
+      transition: color .2s;
+    }
+    .contact-link:hover { color: #fff; }
+
+    /* ─────────────────────────────
+       FOOTER
+    ───────────────────────────── */
+    footer {
+      padding: 18px 28px;
+      border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo img {
+      height: 18px; width: auto;
+      background: transparent; filter: invert(1); opacity: .2;
+    }
+    .footer-copy {
+      font-size: 10px; letter-spacing: .06em;
+      color: rgba(255,255,255,.15);
+    }
+
+    /* ─────────────────────────────
+       MODAL
+    ───────────────────────────── */
+    #modal {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(8,8,8,.96);
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    #modal.open { opacity: 1; pointer-events: auto; }
+
+    .modal-inner {
+      width: 100%; max-width: 1100px;
+      display: grid;
+      grid-template-columns: 5fr 2fr;
+      gap: 40px;
+      align-items: start;
+    }
+    .modal-media {
+      position: relative;
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      background: #111;
+    }
+    .modal-media img,
+    .modal-media video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .modal-body { padding-top: 4px; }
+    .modal-title {
+      font-size: 14px; letter-spacing: .04em;
+      color: rgba(255,255,255,.85);
+      margin-bottom: 6px;
+    }
+    .modal-sub {
+      font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .modal-desc {
+      font-size: 12px; line-height: 1.75;
+      color: rgba(255,255,255,.35);
+    }
+    .modal-close {
+      position: absolute; top: 20px; right: 24px;
+      font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      transition: color .2s;
+    }
+    .modal-close:hover { color: rgba(255,255,255,.7); }
+
+    /* ─────────────────────────────
+       REVEAL
+    ───────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease);
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ─────────────────────────────
+       RESPONSIVE
+    ───────────────────────────── */
+    @media (max-width: 900px) {
+      .g-item.s-wide  { grid-column: span 12; }
+      .g-item.s-tall  { grid-column: span 6; aspect-ratio: 4/5; }
+      .g-item.s-half  { grid-column: span 12; }
+      .g-item.s-third { grid-column: span 6; }
+      .g-item.s-full  { grid-column: span 12; aspect-ratio: 16/9; }
+      .g-item.s-two3  { grid-column: span 12; }
+      .g-item.s-one3  { grid-column: span 6; }
+      #about { grid-template-columns: 1fr; gap: 32px; }
+      .modal-inner { grid-template-columns: 1fr; }
+      .modal-media { aspect-ratio: 4/3; }
+    }
+    @media (max-width: 640px) {
+      .nav { padding: 18px; }
+      .nav-links { gap: 18px; }
+      .g-item.s-tall  { grid-column: span 12; aspect-ratio: 3/2; }
+      .g-item.s-third { grid-column: span 12; }
+      .g-item.s-one3  { grid-column: span 12; }
+      .g-overlay { opacity: 1; }
+      #about, #contact { padding: 60px 18px; }
+      footer { padding: 18px; }
+      .works-label { padding: 0 18px 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .g-item img, .g-item video,
+      .reveal, #modal { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#">
+    <div class="nav-logo"><img src="logo.png" alt="OOPartsArts" /></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#works">Works</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!--
+    ★ ヒーロー動画
+    src="hero.mp4" を入れてください
+  -->
+  <video src="hero.mp4" autoplay loop muted playsinline></video>
+  <div class="hero-id">OOPartsArts</div>
+  <div class="hero-scroll" aria-hidden="true">Scroll</div>
+</section>
+
+<!-- WORKS -->
+<section id="works">
+  <p class="works-label reveal">Works</p>
+
+  <!--
+    ギャラリーグリッド
+    ★ 各 .g-item に画像/動画を入れてください
+    サイズクラス: s-wide / s-tall / s-half / s-third / s-full / s-two3 / s-one3
+  -->
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <p class="about-name">OOPartsArts</p>
+    <p class="about-location">Tokyo</p>
+    <p class="about-disciplines">Film &nbsp;/&nbsp; Music &nbsp;/&nbsp; Art</p>
+  </div>
+  <p class="about-text reveal">
+    <!--
+      ★ 紹介文をここに書いてください（1〜2文推奨）
+    -->
+    映像・音楽・アートを制作するクリエイティブチーム。
+  </p>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="contact-label reveal">Contact</p>
+  <div class="contact-links reveal">
+    <!--
+      ★ 連絡先を更新してください
+    -->
+    <a href="mailto:hello@example.com" class="contact-link">hello@example.com</a>
+    <a href="https://instagram.com/" target="_blank" rel="noopener" class="contact-link">Instagram</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><img src="logo.png" alt="OOPartsArts" /></div>
+  <span class="footer-copy">© 2026 OOPartsArts</span>
+</footer>
+
+<!-- MODAL -->
+<div id="modal" role="dialog" aria-modal="true">
+  <div class="modal-inner">
+    <div class="modal-media" id="modalMedia"></div>
+    <div class="modal-body">
+      <p class="modal-title" id="modalTitle"></p>
+      <p class="modal-sub"  id="modalSub"></p>
+      <p class="modal-desc" id="modalDesc"></p>
+    </div>
+  </div>
+  <button class="modal-close" id="modalClose" aria-label="閉じる">Close</button>
+</div>
+
+<script>
+/* =====================================================
+   WORKS DATA
+   ★ ここを編集してください
+
+   gridClass: ギャラリーでのサイズ
+     "s-wide"  横長大（8/12列, 16:9）
+     "s-tall"  縦長（4/12列, 4:5）
+     "s-half"  半幅（6/12列, 3:2）
+     "s-third" 1/3幅（4/12列, 1:1）
+     "s-full"  全幅（12/12列, シネマ比率）
+     "s-two3"  2/3幅（8/12列, 3:2）
+     "s-one3"  1/3幅（4/12列, 3:2）
+
+   type:  "image" または "video"
+   thumb: ギャラリーのサムネイル（空のまま→グレー）
+   url:   モーダルのメイン素材
+===================================================== */
+const works = [
+  {
+    gridClass: "s-wide",
+    type:  "video",
+    title: "ライブ撮影",
+    tag:   "Film",
+    year:  "2024",
+    thumb: "herosamune.jpg",
+    url:   "tamasi1.mp4",
+    desc:  "ライブ空間の記録。"
+  },
+  {
+    gridClass: "s-tall",
+    type:  "image",
+    title: "作品 B",
+    tag:   "Photo",
+    year:  "2024",
+    thumb: "",
+    url:   "",
+    desc:  ""
+  },
+  {
+    gridClass: "s-full",
+    type:  "image",
+    title: "作品 C",
+    tag:   "Film",
+    year:  "2023",
+    thumb: "",
+    url:   "",
+    desc:  ""
+  },
+  {
+    gridClass: "s-one3",
+    type:  "image",
+    title: "作品 D",
+    tag:   "Art",
+    year:  "2023",
+    thumb: "",
+    url:   "",
+    desc:  ""
+  },
+  {
+    gridClass: "s-two3",
+    type:  "image",
+    title: "作品 E",
+    tag:   "Music",
+    year:  "2023",
+    thumb: "",
+    url:   "",
+    desc:  ""
+  },
+  {
+    gridClass: "s-half",
+    type:  "image",
+    title: "作品 F",
+    tag:   "Film",
+    year:  "2022",
+    thumb: "",
+    url:   "",
+    desc:  ""
+  },
+  {
+    gridClass: "s-half",
+    type:  "image",
+    title: "作品 G",
+    tag:   "Art",
+    year:  "2022",
+    thumb: "",
+    url:   "",
+    desc:  ""
+  },
+];
+
+/* ── ギャラリー生成 ── */
+const gallery = document.getElementById('gallery');
+
+works.forEach(w => {
+  const item = document.createElement('div');
+  item.className = `g-item ${w.gridClass}`;
+
+  const media = w.type === 'video' && w.thumb
+    ? `<video src="${w.thumb}" autoplay loop muted playsinline></video>`
+    : `<img src="${w.thumb}" alt="${w.title}" loading="lazy" />`;
+
+  item.innerHTML = `
+    ${media}
+    <div class="g-overlay">
+      <p class="g-title">${w.title}</p>
+      <p class="g-meta">${w.tag} &nbsp;${w.year}</p>
+    </div>
+  `;
+
+  item.addEventListener('click', () => openModal(w));
+  gallery.appendChild(item);
+});
+
+/* ── モーダル ── */
+const modal     = document.getElementById('modal');
+const modalClose = document.getElementById('modalClose');
+
+function openModal(w) {
+  const media = document.getElementById('modalMedia');
+  if (w.type === 'video' && w.url) {
+    media.innerHTML = `<video src="${w.url}" autoplay loop muted playsinline controls></video>`;
+  } else {
+    media.innerHTML = `<img src="${w.url || w.thumb}" alt="${w.title}" />`;
+  }
+  document.getElementById('modalTitle').textContent = w.title;
+  document.getElementById('modalSub').textContent   = `${w.tag}  ${w.year}`;
+  document.getElementById('modalDesc').textContent  = w.desc;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  const v = modal.querySelector('video');
+  if (v) v.pause();
+}
+
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ── スクロールリビール ── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
