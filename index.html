@@ -50,7 +50,7 @@
       display: flex; justify-content: space-between; align-items: center;
     }
     .nav-logo img {
-      height: 40px; width: auto;
+      height: 24px; width: auto;
       object-fit: contain; background: transparent;
       filter: invert(1); opacity: .9;
     }
@@ -288,7 +288,19 @@
     .modal-desc {
       font-size: 12px; line-height: 1.75;
       color: rgba(255,255,255,.35);
+      margin-bottom: 24px;
     }
+    .modal-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+      border: 1px solid rgba(255,255,255,.15);
+      padding: 8px 14px;
+      transition: color .2s, border-color .2s;
+      text-decoration: none;
+    }
+    .modal-link:hover { color: #fff; border-color: rgba(255,255,255,.5); }
+    .modal-link-icon { font-size: 13px; }
     .modal-close {
       position: absolute; top: 20px; right: 24px;
       font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
@@ -343,7 +355,7 @@
 <!-- NAV -->
 <nav class="nav">
   <a href="#">
-    <div class="nav-logo"><img src="images/logo.png" alt="OOPartsArts" /></div>
+    <div class="nav-logo"><img src="logo.png" alt="OOPartsArts" /></div>
   </a>
   <ul class="nav-links">
     <li><a href="#works">Works</a></li>
@@ -358,7 +370,7 @@
     ★ ヒーロー動画
     src="hero.mp4" を入れてください
   -->
-  <video src="videos/hero.mp4" autoplay loop muted playsinline></video>
+  <video src="hero.mp4" autoplay loop muted playsinline></video>
   <div class="hero-id">OOPartsArts</div>
   <div class="hero-scroll" aria-hidden="true">Scroll</div>
 </section>
@@ -397,14 +409,14 @@
     <!--
       ★ 連絡先を更新してください
     -->
-    <a href="oopartsartss@gmail.com" class="contact-link">oopartsartss@gmail.com</a>
+    <a href="mailto:oopartsartss@gmail.com" class="contact-link">oopartsartss@gmail.com</a>
     <a href="https://www.instagram.com/oopartsarts/" target="_blank" rel="noopener" class="contact-link">Instagram</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo"><img src="images/logo.png" alt="OOPartsArts" /></div>
+  <div class="footer-logo"><img src="logo.png" alt="OOPartsArts" /></div>
   <span class="footer-copy">© 2026 OOPartsArts</span>
 </footer>
 
@@ -416,6 +428,7 @@
       <p class="modal-title" id="modalTitle"></p>
       <p class="modal-sub"  id="modalSub"></p>
       <p class="modal-desc" id="modalDesc"></p>
+      <div id="modalLink"></div>
     </div>
   </div>
   <button class="modal-close" id="modalClose" aria-label="閉じる">Close</button>
@@ -446,9 +459,11 @@ const works = [
     title: "ライブ撮影",
     tag:   "Film",
     year:  "2024",
-    thumb: "images/tamesi.png",
+    thumb: "tamesi.jpg",
     url:   "videos/tamasi1.mp4",
-    desc:  "ライブ空間の記録。"
+    desc:  "ライブ空間の記録。",
+    link:      "https://www.youtube.com/watch?v=xxxxx", // ← YouTubeのURL
+    linkLabel: "YouTube で見る",                        // ← ボタンのテキスト
   },
   {
     gridClass: "s-tall",
@@ -473,21 +488,21 @@ const works = [
   {
     gridClass: "s-one3",
     type:  "image",
-    title: "reizoka",
+    title: "yukadesu",
     tag:   "Art",
     year:  "2023",
     thumb: "",
-    url:   "images/reizoka.jpg",
+    url:   "images/yukadesu.jpg",
     desc:  ""
   },
   {
     gridClass: "s-two3",
     type:  "image",
-    title: "床",
+    title: "reizoka",
     tag:   "Music",
     year:  "2023",
     thumb: "",
-    url:   "images/yukadesu.jpg",
+    url:   "images/reizoka.jpg",
     desc:  ""
   },
   {
@@ -519,17 +534,46 @@ works.forEach(w => {
   const item = document.createElement('div');
   item.className = `g-item ${w.gridClass}`;
 
-  const media = w.type === 'video' && w.thumb
-    ? `<video src="${w.thumb}" autoplay loop muted playsinline></video>`
-    : `<img src="${w.thumb}" alt="${w.title}" loading="lazy" />`;
+  // 動画作品: thumb の有無にかかわらず <video> を使う
+  // thumb があれば poster として使用、なければ動画先頭 0.1s を表示
+  if (w.type === 'video') {
+    const poster = w.thumb ? `poster="${w.thumb}"` : '';
+    item.innerHTML = `
+      <video src="${w.url}" ${poster} muted loop playsinline preload="metadata"></video>
+      <div class="g-overlay">
+        <p class="g-title">${w.title}</p>
+        <p class="g-meta">${w.tag} &nbsp;${w.year}</p>
+      </div>
+    `;
 
-  item.innerHTML = `
-    ${media}
-    <div class="g-overlay">
-      <p class="g-title">${w.title}</p>
-      <p class="g-meta">${w.tag} &nbsp;${w.year}</p>
-    </div>
-  `;
+    const video = item.querySelector('video');
+
+    // thumb がない場合: 0.1s にシークしてサムネイル代わりにする
+    if (!w.thumb) {
+      video.addEventListener('loadedmetadata', () => {
+        video.currentTime = 0.1;
+      });
+    }
+
+    // ホバーで再生 / 離れたら先頭に戻して停止
+    item.addEventListener('mouseenter', () => {
+      video.play().catch(() => {});
+    });
+    item.addEventListener('mouseleave', () => {
+      video.pause();
+      video.currentTime = w.thumb ? 0 : 0.1;
+    });
+
+  } else {
+    // 画像作品
+    item.innerHTML = `
+      <img src="${w.thumb || w.url}" alt="${w.title}" loading="lazy" />
+      <div class="g-overlay">
+        <p class="g-title">${w.title}</p>
+        <p class="g-meta">${w.tag} &nbsp;${w.year}</p>
+      </div>
+    `;
+  }
 
   item.addEventListener('click', () => openModal(w));
   gallery.appendChild(item);
@@ -542,13 +586,50 @@ const modalClose = document.getElementById('modalClose');
 function openModal(w) {
   const media = document.getElementById('modalMedia');
   if (w.type === 'video' && w.url) {
-    media.innerHTML = `<video src="${w.url}" autoplay loop muted playsinline controls></video>`;
+    // muted を外して音ありで再生
+    // ブラウザのautoplay制限で弾かれた場合は muted で再生してから unmute
+    const v = document.createElement('video');
+    v.src = w.url;
+    v.loop = true;
+    v.playsInline = true;
+    v.controls = true;
+    v.style.position = 'absolute';
+    v.style.inset = '0';
+    v.style.width = '100%';
+    v.style.height = '100%';
+    v.style.objectFit = 'cover';
+
+    media.innerHTML = '';
+    media.appendChild(v);
+
+    // 音ありで再生を試みる
+    v.play().catch(() => {
+      // ブラウザに弾かれたら muted で再生してから音を出す
+      v.muted = true;
+      v.play().then(() => {
+        v.muted = false;
+      }).catch(() => {});
+    });
+
   } else {
     media.innerHTML = `<img src="${w.url || w.thumb}" alt="${w.title}" />`;
   }
   document.getElementById('modalTitle').textContent = w.title;
   document.getElementById('modalSub').textContent   = `${w.tag}  ${w.year}`;
   document.getElementById('modalDesc').textContent  = w.desc;
+
+  // 外部リンク（YouTube等）
+  const linkEl = document.getElementById('modalLink');
+  if (w.link) {
+    const label = w.linkLabel || 'Watch →';
+    linkEl.innerHTML = `
+      <a href="${w.link}" target="_blank" rel="noopener" class="modal-link">
+        <span class="modal-link-icon">↗</span>${label}
+      </a>`;
+  } else {
+    linkEl.innerHTML = '';
+  }
+
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
