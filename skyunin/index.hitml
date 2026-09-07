@@ -425,7 +425,7 @@
   <div class="hero-content">
     <p class="hero-tag">Tokyo — Pop Band</p>
     <h1 class="hero-name">S級任務</h1>
-    <p class="hero-sub">Hayate &nbsp;/&nbsp; Kin-chan &nbsp;/&nbsp; ギタリスト?</p>
+    <p class="hero-sub">Hayate &nbsp;/&nbsp; Kin-chan</p>
   </div>
   <div class="hero-scroll" aria-hidden="true">Scroll</div>
 </section>
@@ -574,12 +574,6 @@ const members = [
   {
     name:  "Kin-chan",
     role:  "Bass",
-    photo: "",
-    note:  "",
-  },
-  {
-    name:  "ギタリスト?",
-    role:  "Guitar",
     photo: "",
     note:  "",
   },
