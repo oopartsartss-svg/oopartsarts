@@ -472,7 +472,7 @@
         <!--
           ★ ジャケット画像
           <img src="images/sanzen-jacket.jpg" alt="燦然" />
-        --><img src="../images/inori.jacket.jpg" alt="祈り" />
+        --><img src="../images/inori_jacket.jpg" alt="祈り" />
       </div>
       <div class="featured-body">
         <p class="featured-new reveal">Latest Single</p>
@@ -561,7 +561,7 @@
 
 /* ── 配信サービス（アーティストページ） ── */
 const streaming = [
-  { name: "YouTube Music", cls: "yt", url: "www.youtube.com/@sq_ninmu" /* S級任務のYouTubeチャンネルURL */ },
+  { name: "YouTube Music", cls: "yt", url: "https://www.youtube.com/@sq_ninmu" },
   { name: "Spotify",       cls: "sp", url: "https://open.spotify.com/intl-ja/artist/5NfpjUyf3PX2DggWkz2kAl?si=THM_iQqCT72z31g4g6lJQg" /* S級任務のSpotifyアーティストURL */ },
   { name: "Apple Music",   cls: "am", url: "https://music.apple.com/jp/artist/s%E7%B4%9A%E4%BB%BB%E5%8B%99/1896535377" /* S級任務のApple MusicURL */ },
 ];
@@ -589,13 +589,16 @@ const mvs = [
 ];
 
 /* ── ライブ情報 ── */
-const lives = [ month: "oct",
+const lives = [
+  {
+    month: "Oct",
     day:   "8",
-    title: "ライブタイトル",
-    venue: "会場名 / 東京",
-    ticket: "チケットURL",
+    title: "LOVE SPREADS supported by Eggs",
+    venue: "下北沢THREE / 東京",
+    ticket: "",
     sold:   false,
-  /*
+  },
+  /* 追加する場合:
   {
     month: "Jan",
     day:   "25",
@@ -612,7 +615,7 @@ const members = [
   {
     name:  "Hayate",
     role:  "Vocal",
-    photo: "", /* images/hayate.jpg */
+    photo: "../images/hayate.jpg", /* images/hayate.jpg */
     note:  "",
   },
   {
