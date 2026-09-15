@@ -304,7 +304,16 @@
       margin-bottom: 6px;
     }
     .member-name { font-size: 15px; font-weight: 600; letter-spacing: .02em; }
-    .member-note { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+    .member-instagram {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 10px;
+      font-size: 10px; letter-spacing: .1em;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(240,237,232,.12);
+      padding-bottom: 1px;
+      transition: color .2s, border-color .2s;
+    }
+    .member-instagram:hover { color: var(--fg); border-color: rgba(240,237,232,.4); }
 
     /* ── STORE ── */
     #store { padding: 80px 28px; border-top: 1px solid var(--line); }
@@ -593,9 +602,9 @@ const lives = [
   {
     month: "Oct",
     day:   "8",
-    title: "ライブタイトル",
-    venue: "会場名 / 東京",
-    ticket: "チケットURL",
+    title: "LOVE SPREADS supported by Eggs",
+    venue: "下北沢 THREE / 東京",
+    ticket: "",
     sold:   false,
   },
   /* 追加する場合:
@@ -613,16 +622,18 @@ const lives = [
 /* ── メンバー ── */
 const members = [
   {
-    name:  "Hayate",
-    role:  "Vocal",
-    photo: "../images/hayate.jpg", /* images/hayate.jpg */
-    note:  "",
+    name:      "Hayate",
+    role:      "Vocal",
+    photo:     "../images/hayate.jpg",
+    note:      "",
+    instagram: "https://www.instagram.com/sq.hayate/?hl=ja", /* HayateのInstagramURL */
   },
   {
-    name:  "Kin-chan",
-    role:  "Bass",
-    photo: "../images/kinchan.jpg",
-    note:  "",
+    name:      "Kin-chan",
+    role:      "Bass",
+    photo:     "../images/kinchan.jpg",
+    note:      "",
+    instagram: "https://www.instagram.com/kinnosukeokada/?hl=ja", /* Kin-chanのInstagramURL */
   },
 ];
 
@@ -704,6 +715,7 @@ document.getElementById('membersGrid').innerHTML = members.map(m => `
       <p class="member-role">${m.role}</p>
       <p class="member-name">${m.name}</p>
       ${m.note ? `<p class="member-note">${m.note}</p>` : ''}
+      ${m.instagram ? `<a href="${m.instagram}" target="_blank" rel="noopener" class="member-instagram">Instagram →</a>` : ''}
     </div>
   </div>
 `).join('');
